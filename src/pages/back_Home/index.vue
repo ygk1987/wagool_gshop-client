@@ -2,16 +2,12 @@
   <div class="home">
     <!-- 商品分类导航 -->
     <TypeNav />
-    
     <!--列表-->
-    <ListContainer />
-
+    <ListContainer/>
     <!--今日推荐-->
-    <TodyRecommend />
-    
+    <TodayRecommond />
     <!-- 商品排行 -->
     <Rank />
-
     <!-- 猜你喜欢 -->
     <Like />
 
@@ -27,23 +23,19 @@
 </template>
 
 <script>
-  import TodyRecommend from './TodayRecommend/TodayRecommend'
   import Brand from './Brand/Brand'
   import Floor from './Floor/Floor'
   import Like from './Like/Like'
   import ListContainer from './ListContainer/ListContainer'
   import Rank from './Rank/Rank'
+  import TodayRecommond from './TodayRecommond/TodayRecommond'
+  
   export default {
     name: 'Home',
 
-    mounted(){
-      //触发vuex的异步action调用,从mock接口请求数据到state中
-      this.$store.dispatch('getBanners');
-      this.$store.dispatch('getFloors');
-    },
-
-    components: { // 局部注册, 只能在当前组件中使用
-      TodyRecommend,
+    //局部注册,只能在当前组件中使用
+    components: {
+      TodayRecommond,
       Brand,
       Floor,
       Like,
@@ -54,4 +46,5 @@
 </script>
 
 <style lang="less" scoped>
+ 
 </style>
