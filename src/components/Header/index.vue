@@ -48,6 +48,12 @@
         keyword: '',
       }
     },
+    mounted(){
+      //通过全局事件总线绑定removeKeyword事件监听
+      this.$bus.$on('removeKeyword', () => {
+        this.keyword = '';
+      })
+    },
     methods: {
       toSearch(){
         /*
@@ -70,14 +76,32 @@
         // this.$router.push(`/search/${this.keyword}`)
         //2.传params对象参数
         // this.$router.push({path:'/search', params: {keyword: this.keyword}}) //错误
+
         //判断是否有参数数据
-        if(this.keyword){
-          this.$router.push({name:'search', params: {keyword: this.keyword}})
-        }else{
-          this.$router.push({name:'search'});
+        //得到当前的请求路径和query参数对象
+        const {path, query} = this.$route
+        if(this.keyword){ //一、有关键字搜索
+          //判断是否在搜索页面
+          //如果有关键字搜索并当前在搜索页面,需要同时携带params和query参数
+          if(path.indexOf('/search')===0){
+            this.$router.push({
+              name:'search', 
+              params: {keyword: this.keyword},
+              query
+            })
+          }else{ //如果有关键字搜索但不在搜索页面,只携带params参数
+              this.$router.push({name:'search', params: {keyword: this.keyword}})
+            }
+        }else{//二、没有关键字搜索
+          //如果没有关键字搜索但当前在搜索页面,需要同时携带params和query参数
+          if(path.indexOf('/search')===0){
+            this.$router.push({name:'search',query});
+          }else{
+            //如果没有关键字搜索,当前也不在搜索页面,需要同时携带params参数
+            this.$router.push({name:'search'});
+          } 
         }
         
-
         //解决方案1:在跳转时指定成功的或失败的回调函数
         // this.$router.push('/search', () => {
           // console.log('跳转成功!!!');

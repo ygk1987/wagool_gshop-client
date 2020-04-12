@@ -7,6 +7,7 @@ import routes from './routes.js'
 
 //方案2.修正Vue原型上的push和replace方法
 const originPush = VueRouter.prototype.push;
+const originReplace = VueRouter.prototype.replace;
 //给成功的回调参数指定一个默认的函数
 VueRouter.prototype.push = function (location, onComplete=() => {}, onAbort) {
   return originPush.call(this, location, onComplete, onAbort);
@@ -18,7 +19,8 @@ VueRouter.prototype.push = function (location, onComplete=() => {}, onAbort) {
 // }
 
 VueRouter.prototype.replace = function (location, onComplete, onAbort) {
-  return originPush.call(this, location, onComplete, onAbort).catch(() => {});
+  // return originPush.call(this, location, onComplete, onAbort).catch(() => {});
+  return originReplace.call(this, location, onComplete, onAbort).catch(() => {});
 }
 
 //声明使用vue的插件
@@ -31,4 +33,13 @@ export default new VueRouter({
 
   //配置应用中的所有路由
   routes,
+
+  //滚动配置行为,跳转路由时自动滚动到最上面
+  scrollBehavior(to, from, savePosition){
+    //return 期望滚动到哪个位置
+    return{
+      x:0, //水平方向最左边
+      y:0 //垂直方向最上面
+    }
+  }
 })

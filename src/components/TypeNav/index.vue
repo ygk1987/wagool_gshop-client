@@ -109,8 +109,19 @@
         }else if(category3id){
           query.category3Id = category3id
         }
-        //跳转路由并携带query参数
-        this.$router.push({path:'/search', query});
+        /* 区分是否在当前搜索界面 */
+        //1.如果当前已经在搜索界面
+        //得到当前路由路径
+        const path = this.$route.path;
+        if(path.indexOf('/search')===0){
+          //跳转到搜索界面,path为原本的路径(可能携带了params参数)
+          // this.$router.push({path, query})
+          this.$router.replace({path, query}) //这里用replace是为了可以直接回退到home
+        }else{
+          //2.当前没有在搜索界面
+          //跳转路由并携带query参数
+          this.$router.push({path:'/search', query});
+        }
       }
 
       //这种写法不严谨
