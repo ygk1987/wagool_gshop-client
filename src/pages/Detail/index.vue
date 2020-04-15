@@ -16,9 +16,11 @@
         <!-- 左侧放大镜区域 -->
         <div class="previewWrap"> 
           <!--放大镜效果-->
-          <Zoom />
+          <Zoom v-if="skuImageList.length > 0"
+          :imgUrl="skuImageList[currentImgIndex].imgUrl" 
+          :bigImgUrl="skuImageList[currentImgIndex].imgUrl"/>
           <!-- 小图列表 -->
-          <ImageList />
+          <ImageList @changeCurrentIndex="changeCurrentIndex"/>
         </div>
         <!-- 右侧选择区域布局 -->
         <div class="InfoWrap">
@@ -75,12 +77,12 @@
             </div>
             <div class="cartWrap">
               <div class="controls">
-                <input autocomplete="off" class="itxt">
-                <a href="javascript:" class="plus">+</a>
-                <a href="javascript:" class="mins">-</a>
+                <input autocomplete="off" class="itxt" v-model="skuNum">
+                <a href="javascript:" class="plus" @click="skuNum++">+</a>
+                <a href="javascript:" class="mins" @click="skuNum--" v-if="skuNum>1">-</a>
               </div>
               <div class="add">
-                <a href="javascript:">加入购物车</a>
+                <a href="javascript:" @click="addToCart">加入购物车</a>
               </div>
             </div>
           </div>
@@ -337,6 +339,12 @@
 
   export default {
     name: 'Detail',
+    data(){
+      return{
+        currentImgIndex: 0, //当前图片下标
+        skuNum: 1 //商品的数量
+      }
+    },
 
     mounted(){
       //取出skuId的params参数
@@ -346,7 +354,7 @@
     },
 
     computed:{
-      ...mapGetters(['categoryView', 'skuInfo', 'spuSaleAttrList']),
+      ...mapGetters(['categoryView', 'skuInfo', 'spuSaleAttrList', 'skuImageList']),
     },
 
     methods:{
@@ -360,9 +368,34 @@
           value.isChecked = '1'
         }
       },
+
+      //changeCurrentIndex事件的回调函数
+      changeCurrentIndex(index){
+        this.currentImgIndex = index;
+      },
+
+      //将当前商品添加到购物车,成功后跳转到成功界面
+      async addToCart(){
+        this.query = {skuId: this.skuInfo.id, skuNum: this.skuNum}
+        //分发添加购物车的axtion
+        this.$store.dispatch('addToCart', {...this.query, callback:this.callback}); 
+        // const errorMsg = await this.$store.dispatch('addToCart2', this.query)
+      },
+      //该回调处理是否成功添加到购物车
+      callback(errorMsg){
+        //如果成功了
+        if(!errorMsg){
+          //在跳转前将skuInfo保存到sessionStorage(key=value, value只能是字符串)
+          window.sessionStorage.setItem('SKU_INFO_KEY', JSON.stringify(this.skuInfo))
+
+          //路由跳转到购物车成功的界面
+          this.$router.push({path: '/addcartsuccess', query:this.query});
+        }else{
+          alert(errorMsg);
+        }
+      }
     },
-    
-    
+  
     components: {
       ImageList,
       Zoom

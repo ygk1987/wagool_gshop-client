@@ -4,10 +4,12 @@
 2. 显示请求进度条
 3. 成功返回的数据不再是response, 而直接是响应体数据response.data
 4. 统一处理请求错误, 具体请求也可以选择处理或不处理
+5. 所有请求都要携带userTempId的请求头
 */
 import axios from 'axios';
 import NProgress from 'nprogress';
 import 'nprogress/nprogress.css';
+import store from '@/store'
 
 //配置不显示右上角的旋转进度条,只显示水平的
 // NProgress.configure({ showSpinner:false })
@@ -23,6 +25,9 @@ ajax.interceptors.request.use((config) => {
   // 2. 显示请求进度条
   //显示进度条
   NProgress.start();
+
+  //所有请求都要携带userTempId的请求头
+  config.headers['userTempId'] = store.state.user.userTempId
 
   //必须返回config
   return config

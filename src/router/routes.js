@@ -4,6 +4,8 @@ import Register from '@/pages/Register'
 import Login from '@/pages/Login'
 import Search from '@/pages/Search'
 import Detail from '@/pages/Detail'
+import AddCartSuccess from '@/pages/AddCartSuccess'
+import ShopCart from '@/pages/ShopCart'
 
 export default [
   {
@@ -15,6 +17,16 @@ export default [
     name: 'detail', //如果是params参数需要指定此名称
     path: '/detail/:skuId',
     component: Detail,
+  },
+  //注册添加购物的路由跳转
+  {
+    path: '/addcartsuccess',
+    component: AddCartSuccess,
+  },
+  //注册结算路由跳转
+  {
+    path: '/shopcart',
+    component: ShopCart,
   },
 
   {

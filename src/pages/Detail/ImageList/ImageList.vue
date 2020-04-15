@@ -1,16 +1,9 @@
 <template>
-  <div class="swiper-container">
+  <div class="swiper-container" ref="swiper">
     <div class="swiper-wrapper">
-      <div class="swiper-slide">
-        <img src="../images/s1.png">
-        <img src="../images/s2.png">
-        <img src="../images/s3.png">
-        <img src="../images/s1.png">
-        <img src="../images/s2.png">
-        <img src="../images/s3.png">
-        <img src="../images/s1.png">
-        <img src="../images/s2.png">
-        <img src="../images/s3.png">
+      <div class="swiper-slide" v-for="(skuImg,index) in skuImageList" :key="skuImg.id">
+        <img :src="skuImg.imgUrl" :class="{active: currentIndex=== index}"
+        @click="changeCurrentIndex(index)">
       </div>
     </div>
     <div class="swiper-button-next"></div>
@@ -19,10 +12,51 @@
 </template>
 
 <script>
-
+  import { mapGetters } from 'vuex';
   import Swiper from 'swiper'
   export default {
     name: "ImageList",
+
+    data(){
+      return{
+        currentIndex: 0, // 当前图片的下标
+      }
+    },
+
+    computed:{
+      ...mapGetters(['skuImageList'])
+    },
+
+    watch:{
+      skuImageList:{
+        handler(value) {
+          //如果图片数组长度为0,直接结束
+          if(value.length == 0) return;
+          //延迟到界面更新后才创建swiper对象
+          this.$nextTick(() => {
+            new Swiper(this.$refs.swiper, {
+              slidesPerView: 2, // 一次显示5页
+              slidesPerGroup: 1, // 以2页为单位翻页
+                navigation: { //指定翻页按钮
+                  nextEl: '.swiper-button-next',
+                  prevEl: '.swiper-button-prev',
+                },
+            })
+          })
+        },
+        immediate: true, //初始化立即调用
+      },
+    },
+
+    methods: {
+      //修当前图片下标
+      changeCurrentIndex(index){
+        //改变当前下标
+        this.currentIndex = index;
+        //分发子定义事件,通知父组件detail
+        this.$emit('changeCurrentIndex', index)
+      }
+    }
   }
 </script>
 
