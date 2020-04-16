@@ -21,7 +21,7 @@
               </div>
               <div class="input-text clearFix">
                 <span class="pwd"></span>
-                <input type="text" placeholder="请输入密码" v-model="password">
+                <input type="password" placeholder="请输入密码" v-model="password">
               </div>
               <div class="setting clearFix">
                 <label class="checkbox inline">
@@ -31,7 +31,7 @@
                 <span class="forget">忘记密码？</span>
               </div>
               <router-link to="/">
-                  <button class="btn" @click="login">登&nbsp;&nbsp;录</button>
+                  <button class="btn" @click.prevent="login">登&nbsp;&nbsp;录</button>
               </router-link>
             </form>
             <div class="call clearFix">
@@ -67,6 +67,7 @@
 </template>
 
 <script>
+  // import store from '@/store'
   export default {
     name: 'Login',
     data(){
@@ -78,16 +79,53 @@
     methods:{
       async login(){
         const { mobile, password } = this
+        //前台校验
+
         try {
+          //发送异步登录请求
           await this.$store.dispatch('login', {mobile, password})
           //如果成功了, 跳转到主页
-          this.$router.push('/')
+          // this.$router.replace('/')
+
+          // 得到需要自动跳转的路由路径 (可能有也可能没有)
+          const {redirect} = this.$route.query
+          // 跳转到前面想去没能去成的路由, 如果没有就去首页
+          this.$router.replace(redirect || '/')
+          
         } catch (error) {
           //如果失败了, 提示失败文本,并跳转到登录页面重新登录或注册
           alert(error.message)
-          this.$router.replace('/login')
+          // this.$router.replace('/login')
         }
       }
+    },
+
+    //组件前置守卫
+    beforeRouterEnter:(to, from, next) => { //在即将跳转到login时调用
+      //如果已经登录,自动跳转到首页
+      // if(store.state.user.userInfo.name){
+  
+      /* 
+      报错: Cannot read property '$store' of undefined
+      分析: beforeRouteEnter()是在路由组件对象创建前调用的, this是undefined, 不能直接使用
+      */
+      // 如果已经登陆, 自动跳转到首页
+      /* 错误的做法 */
+      // if(this.$store.state.user.userInfo.name){
+      //   next('/')
+      // }else{
+        //如果没有登录,放行显示登录界面
+      //   next();
+      // } 
+      
+      next(component => {// 此回调函数在组件对象被创建后才自动执行, 且传入了组件对象
+        if(component.$store.state.user.userInfo.name){
+          next('/')
+        }else{
+          // 如果没有登录,放行显示登录界面
+          next();
+        } 
+      })
     }
   }
 </script>

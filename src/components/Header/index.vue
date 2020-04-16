@@ -5,15 +5,22 @@
       <div class="container">
         <div class="loginList">
           <p>尚品汇欢迎您！</p>
-          <p>
+          <!-- 已登陆显示 -->
+          <p v-if="userInfo.name">
+            <span>{{userInfo.name}}</span>
+            &nbsp;&nbsp;&nbsp;
+            <a href="javascript:;" @click="logout">退出</a>
+          </p>
+          <!-- 未登陆显示 -->
+          <p v-else>
             <span>请</span>
             <router-link to="/login">登录</router-link>
             <router-link to="/register" class="register">免费注册</router-link>
           </p>
         </div>
         <div class="typeList">
-          <a href="###">我的订单</a>
-          <a href="###">我的购物车</a>
+          <router-link to="/center/myorder">我的订单</router-link>
+          <router-link to="/shopcart">我的购物车</router-link>
           <a href="###">我的尚品汇</a>
           <a href="###">尚品汇会员</a>
           <a href="###">企业采购</a>
@@ -41,6 +48,7 @@
 </template>
 
 <script>
+  import { mapState } from 'vuex';
   export default {
     name: 'Header',
     data(){
@@ -48,13 +56,33 @@
         keyword: '',
       }
     },
+
+    //计算属性
+    computed: {
+      ...mapState({
+        userInfo: state => state.user.userInfo
+      })
+    },
+
+    //生命周期函数
     mounted(){
       //通过全局事件总线绑定removeKeyword事件监听
       this.$bus.$on('removeKeyword', () => {
         this.keyword = '';
       })
     },
+
     methods: {
+      //退出
+      async logout(){
+        try{
+          await this.$store.dispatch('loginout')
+        }catch(error){
+          alert(error.message)
+        }
+      },
+
+      //搜索
       toSearch(){
         /*
           利用router对象来跳转路由
